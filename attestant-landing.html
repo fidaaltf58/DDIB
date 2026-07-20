@@ -1,0 +1,589 @@
+<title>Attestant — Proof that travels with the person who earned it</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --ink: #14140F;
+    --ink-raised: #1D1D16;
+    --bone: #EFE9D8;
+    --bone-muted: #B7AF93;
+    --paper: #F3EFE4;
+    --paper-raised: #FBF8EF;
+    --paper-text: #201F18;
+    --paper-text-muted: #5B5849;
+    --line: #DBD4BE;
+    --line-on-ink: #33321F;
+    --brass: #C89B3C;
+    --brass-deep: #8F6A22;
+    --verify: #3E6B50;
+    --verify-soft: #E1E9E0;
+    --clay: #A6512F;
+    --clay-soft: #F1E1D8;
+    --shadow: 0 1px 0 rgba(20,20,15,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #0E0E0B;
+      --ink-raised: #18170F;
+      --bone: #EFE9D8;
+      --bone-muted: #9C9578;
+      --paper: #1B1A13;
+      --paper-raised: #24221A;
+      --paper-text: #E9E3D2;
+      --paper-text-muted: #A79F86;
+      --line: #38351F;
+      --line-on-ink: #2C2B1C;
+      --brass: #DDB25C;
+      --brass-deep: #EFCB84;
+      --verify: #7FB496;
+      --verify-soft: #1E2B22;
+      --clay: #D98862;
+      --clay-soft: #2E2018;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #0E0E0B; --ink-raised: #18170F; --bone: #EFE9D8; --bone-muted: #9C9578;
+    --paper: #1B1A13; --paper-raised: #24221A; --paper-text: #E9E3D2; --paper-text-muted: #A79F86;
+    --line: #38351F; --line-on-ink: #2C2B1C; --brass: #DDB25C; --brass-deep: #EFCB84;
+    --verify: #7FB496; --verify-soft: #1E2B22; --clay: #D98862; --clay-soft: #2E2018;
+  }
+  :root[data-theme="light"] {
+    --ink: #14140F; --ink-raised: #1D1D16; --bone: #EFE9D8; --bone-muted: #B7AF93;
+    --paper: #F3EFE4; --paper-raised: #FBF8EF; --paper-text: #201F18; --paper-text-muted: #5B5849;
+    --line: #DBD4BE; --line-on-ink: #33321F; --brass: #C89B3C; --brass-deep: #8F6A22;
+    --verify: #3E6B50; --verify-soft: #E1E9E0; --clay: #A6512F; --clay-soft: #F1E1D8;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--paper-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .serif { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif; }
+  .mono { font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+  img, svg { max-width: 100%; }
+  section { position: relative; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--ink) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-on-ink);
+  }
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .wordmark { color: var(--bone); font-size: 15px; letter-spacing: 0.04em; font-weight: 600; }
+  .wordmark b { color: var(--brass); }
+  .nav-links { display: flex; gap: 26px; font-size: 13.5px; }
+  .nav-links a { color: var(--bone-muted); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a:focus-visible { color: var(--bone); }
+  .nav-links { display: none; }
+  @media (min-width: 720px) { .nav-links { display: flex; } }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: var(--ink);
+    color: var(--bone);
+    padding: 88px 24px 96px;
+  }
+  .hero-inner { max-width: 1080px; margin: 0 auto; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+    font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--brass); margin-bottom: 22px; display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--brass); display: inline-block; }
+  h1.hero-title {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 400;
+    font-size: clamp(34px, 5.6vw, 62px);
+    line-height: 1.06;
+    margin: 0 0 26px;
+    max-width: 15ch;
+    text-wrap: balance;
+  }
+  .hero-title em { font-style: italic; color: var(--brass); }
+  .hero-lede {
+    font-size: 17.5px;
+    color: var(--bone-muted);
+    max-width: 56ch;
+    margin: 0 0 40px;
+  }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 56px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px; font-size: 14px; font-weight: 600;
+    border-radius: 3px; text-decoration: none; cursor: pointer; border: 1px solid transparent;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary { background: var(--brass); color: #1B1502; }
+  .btn-primary:hover { background: var(--brass-deep); }
+  .btn-ghost { border-color: var(--line-on-ink); color: var(--bone); }
+  .btn-ghost:hover { border-color: var(--brass); }
+
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line-on-ink); border: 1px solid var(--line-on-ink);
+    max-width: 640px;
+  }
+  .hero-stat { background: var(--ink); padding: 18px 20px; }
+  .hero-stat .num { font-family: ui-monospace, monospace; font-size: 22px; color: var(--brass); display: block; margin-bottom: 4px; }
+  .hero-stat .lbl { font-size: 12.5px; color: var(--bone-muted); }
+
+  /* ---------- Problem section ---------- */
+  .problem { padding: 96px 24px; }
+  .section-head { max-width: 62ch; margin-bottom: 48px; }
+  .section-eyebrow {
+    font-family: ui-monospace, monospace; font-size: 12px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--verify); margin-bottom: 12px;
+  }
+  h2 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 400; font-size: clamp(26px, 3.6vw, 34px); margin: 0 0 12px; text-wrap: balance;
+  }
+  .section-sub { color: var(--paper-text-muted); font-size: 15.5px; max-width: 58ch; }
+
+  .case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .case-card { background: var(--paper-raised); padding: 26px 24px; }
+  .case-role { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay); margin-bottom: 12px; }
+  .case-text { font-size: 15px; color: var(--paper-text); }
+
+  /* ---------- Invariant callout ---------- */
+  .invariant {
+    background: var(--ink); color: var(--bone);
+    padding: 56px 24px; text-align: center;
+  }
+  .invariant .stamp {
+    display: inline-block; border: 1px solid var(--brass); color: var(--brass);
+    font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 5px 12px; border-radius: 3px; margin-bottom: 22px;
+  }
+  .invariant p {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-size: clamp(20px, 3vw, 28px); max-width: 24ch; margin: 0 auto; line-height: 1.35; text-wrap: balance;
+  }
+  .invariant p em { color: var(--brass); font-style: normal; }
+
+  /* ---------- Asset ledger ---------- */
+  .ledger { padding: 96px 24px; }
+  .ledger-table { border-top: 1px solid var(--line); overflow-x: auto; }
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 1.3fr 0.9fr 2fr 0.9fr;
+    gap: 18px;
+    padding: 20px 4px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    min-width: 640px;
+  }
+  .ledger-row.head {
+    font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--paper-text-muted); padding-bottom: 12px;
+  }
+  .asset-name { font-weight: 700; font-size: 15.5px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.04em;
+    padding: 4px 9px; border-radius: 3px; width: fit-content;
+  }
+  .badge.soulbound { background: var(--verify-soft); color: var(--verify); }
+  .badge.tradeable { background: var(--clay-soft); color: var(--clay); }
+  .badge::before { content: "●"; font-size: 8px; }
+  .asset-desc { font-size: 14px; color: var(--paper-text-muted); }
+  .asset-holder { font-size: 13px; font-family: ui-monospace, monospace; color: var(--paper-text); }
+
+  /* ---------- Loop diagram ---------- */
+  .loop { padding: 96px 24px; background: var(--paper-raised); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .loop-wrap { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+  @media (min-width: 860px) { .loop-wrap { grid-template-columns: 1fr 1fr; } }
+  .loop-diagram { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 460px; margin: 0 auto; }
+  .loop-node {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 128px; text-align: center;
+  }
+  .loop-node .dot {
+    width: 12px; height: 12px; border-radius: 50%; background: var(--brass);
+    margin: 0 auto 8px; border: 3px solid var(--paper-raised); box-shadow: 0 0 0 1px var(--brass);
+  }
+  .loop-node .t { font-size: 12.5px; font-weight: 600; color: var(--paper-text); line-height: 1.3; }
+  .loop-node .s { font-size: 11px; color: var(--paper-text-muted); font-family: ui-monospace, monospace; }
+  .loop-list { display: flex; flex-direction: column; gap: 4px; counter-reset: loopstep; }
+  .loop-item { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 13px 0; border-top: 1px solid var(--line); }
+  .loop-item:last-child { border-bottom: 1px solid var(--line); }
+  .loop-item::before {
+    counter-increment: loopstep; content: counter(loopstep);
+    font-family: ui-monospace, monospace; font-size: 12px; color: var(--brass-deep);
+  }
+  .loop-item b { display: block; font-size: 14.5px; margin-bottom: 2px; }
+  .loop-item span { font-size: 13.5px; color: var(--paper-text-muted); }
+
+  /* ---------- UI preview ---------- */
+  .preview { padding: 96px 24px; }
+  .preview-grid { display: grid; grid-template-columns: 1fr; gap: 26px; }
+  @media (min-width: 860px) { .preview-grid { grid-template-columns: 1fr 1fr; } }
+  .app-frame {
+    background: var(--ink); border-radius: 8px; overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.4);
+  }
+  .app-chrome {
+    display: flex; align-items: center; gap: 6px; padding: 10px 14px;
+    border-bottom: 1px solid var(--line-on-ink);
+  }
+  .app-chrome i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-on-ink); display: inline-block; }
+  .app-chrome span { margin-left: 10px; font-family: ui-monospace, monospace; font-size: 11px; color: var(--bone-muted); }
+  .app-body { padding: 22px; color: var(--bone); }
+  .app-label { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); margin-bottom: 14px; }
+
+  .predicate-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--ink-raised); border: 1px solid var(--line-on-ink);
+    border-radius: 4px; padding: 8px 12px; font-size: 13px; margin: 0 6px 8px 0;
+    font-family: ui-monospace, monospace;
+  }
+  .predicate-chip b { color: var(--brass); font-weight: 600; }
+  .predicate-and { font-size: 11px; color: var(--bone-muted); letter-spacing: 0.1em; margin: 2px 0 8px; }
+
+  .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line-on-ink); font-size: 13.5px; }
+  .profile-row:last-of-type { border-bottom: none; }
+  .profile-row .k { color: var(--bone-muted); }
+  .profile-row .v { font-family: ui-monospace, monospace; color: var(--bone); }
+  .match-result {
+    margin-top: 16px; padding: 12px 14px; background: var(--verify-soft); border-radius: 4px;
+    font-size: 13px; color: var(--verify);
+  }
+  .preview-caption { font-size: 13.5px; color: var(--paper-text-muted); margin-top: 12px; text-align: center; }
+
+  /* ---------- Blockchain design ---------- */
+  .stack { background: var(--ink); color: var(--bone); padding: 96px 24px; }
+  .stack .section-sub { color: var(--bone-muted); }
+  .stack h2 { color: var(--bone); }
+  .layer-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line-on-ink); border: 1px solid var(--line-on-ink); margin-bottom: 48px; }
+  @media (min-width: 720px) { .layer-grid { grid-template-columns: 1fr 1fr; } }
+  .layer-card { background: var(--ink); padding: 26px 24px; }
+  .layer-card .tag { font-family: ui-monospace, monospace; font-size: 11px; color: var(--brass); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .layer-card h3 { font-size: 17px; margin: 0 0 8px; font-weight: 600; }
+  .layer-card p { font-size: 14px; color: var(--bone-muted); margin: 0; }
+
+  .principle-box {
+    border: 1px solid var(--brass); border-radius: 4px; padding: 26px 28px; margin-bottom: 48px;
+  }
+  .principle-box .tag { font-family: ui-monospace, monospace; font-size: 11px; color: var(--brass); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .principle-box h3 { font-family: Georgia, serif; font-weight: 400; font-size: 21px; margin: 0 0 10px; }
+  .principle-box p { font-size: 14.5px; color: var(--bone-muted); margin: 0; max-width: 66ch; }
+
+  .decisions { display: flex; flex-direction: column; }
+  .decision-row { display: grid; grid-template-columns: 160px 1fr; gap: 18px; padding: 15px 0; border-top: 1px solid var(--line-on-ink); }
+  .decision-row:last-child { border-bottom: 1px solid var(--line-on-ink); }
+  .decision-row .k { font-family: ui-monospace, monospace; font-size: 12px; color: var(--brass-deep); }
+  .decision-row .v { font-size: 14px; color: var(--bone); }
+  @media (max-width: 600px) { .decision-row { grid-template-columns: 1fr; gap: 4px; } }
+
+  /* ---------- Audience CTA ---------- */
+  .audience { padding: 96px 24px; }
+  .audience-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (min-width: 780px) { .audience-grid { grid-template-columns: repeat(3, 1fr); } }
+  .audience-card { background: var(--paper-raised); padding: 30px 26px; display: flex; flex-direction: column; }
+  .audience-card .tag { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
+  .audience-card h3 { font-size: 18px; margin: 0 0 10px; font-weight: 700; }
+  .audience-card p { font-size: 14px; color: var(--paper-text-muted); margin: 0 0 20px; flex-grow: 1; }
+  .audience-card .btn { align-self: flex-start; }
+  .btn-outline { border: 1px solid var(--paper-text); color: var(--paper-text); background: transparent; }
+  .btn-outline:hover { border-color: var(--clay); color: var(--clay); }
+
+  /* ---------- Footer ---------- */
+  footer { background: var(--ink); color: var(--bone-muted); padding: 44px 24px; }
+  .footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; }
+  .footer-inner .wordmark { font-size: 14px; }
+  footer .foot-note { font-size: 12.5px; }
+</style>
+
+<nav>
+  <div class="nav-inner">
+    <div class="wordmark"><b>ATT</b>ESTANT</div>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#assets">Assets</a>
+      <a href="#loop">The loop</a>
+      <a href="#product">Product</a>
+      <a href="#stack">Architecture</a>
+      <a href="#audience">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Learn2Earn &middot; built on Hedera</div>
+    <h1 class="hero-title">Proof that travels with the person who <em>earned</em> it.</h1>
+    <p class="hero-lede">A candidate finishes a course and can't prove it to anyone who wasn't there. An employer re-runs verification someone else already did. A funder can't find out if the training worked. Attestant makes the evidence a first-class, portable object &mdash; owned by the person it's about.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#audience">Get started</a>
+      <a class="btn btn-ghost" href="#loop">See how the loop closes</a>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="hero-stat"><span class="num">5</span><span class="lbl">on-chain assets, one invariant</span></div>
+      <div class="hero-stat"><span class="num">2</span><span class="lbl">Hedera services &mdash; HTS + HCS</span></div>
+      <div class="hero-stat"><span class="num">0</span><span class="lbl">ways to buy your way into a job</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="problem" id="problem">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">The problem</div>
+      <h2>Three parties fail at the same moment, for the same reason.</h2>
+      <p class="section-sub">The learning is real. The evidence of it is stranded &mdash; sitting in a PDF, a platform profile, an HR system &mdash; held by everyone except the person who earned it.</p>
+    </div>
+    <div class="case-grid reveal">
+      <div class="case-card">
+        <div class="case-role">Candidate</div>
+        <div class="case-text">Finishes a course, can't prove it to anyone who wasn't there.</div>
+      </div>
+      <div class="case-card">
+        <div class="case-role">Employer</div>
+        <div class="case-text">Meets that candidate, and re-runs verification someone else already did.</div>
+      </div>
+      <div class="case-card">
+        <div class="case-role">Funder</div>
+        <div class="case-text">Paid for the course, can't find out whether it led to a job.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="invariant">
+  <div class="wrap">
+    <span class="stamp">The one rule</span>
+    <p>Whatever confers <em>access</em> cannot be bought &mdash; whatever can be bought confers <em>nothing</em>.</p>
+  </div>
+</div>
+
+<section class="ledger" id="assets">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Five assets</div>
+      <h2>The candidate profile is a ledger, not a resume.</h2>
+      <p class="section-sub">Every asset is one of two kinds: soulbound and unpurchasable, or tradeable and access-free. Nothing is both.</p>
+    </div>
+    <div class="ledger-table reveal">
+      <div class="ledger-row head">
+        <div>Asset</div><div>Kind</div><div>What it does</div><div>Held by</div>
+      </div>
+      <div class="ledger-row">
+        <div class="asset-name">XP Tokens</div>
+        <div><span class="badge soulbound">soulbound</span></div>
+        <div class="asset-desc">Accrue through the small events of learning &mdash; the engagement layer, per issuer.</div>
+        <div class="asset-holder">candidate</div>
+      </div>
+      <div class="ledger-row">
+        <div class="asset-name">Course Credentials</div>
+        <div><span class="badge soulbound">soulbound</span></div>
+        <div class="asset-desc">Issuer-signed proof a specific competency was completed.</div>
+        <div class="asset-holder">candidate</div>
+      </div>
+      <div class="ledger-row">
+        <div class="asset-name">Reputation Credentials</div>
+        <div><span class="badge soulbound">soulbound</span></div>
+        <div class="asset-desc">Carries what other people &mdash; employers, peers &mdash; attest about you.</div>
+        <div class="asset-holder">candidate</div>
+      </div>
+      <div class="ledger-row">
+        <div class="asset-name">Reward Tokens</div>
+        <div><span class="badge tradeable">tradeable</span></div>
+        <div class="asset-desc">Reserve-backed, Rand-denominated. Spendable at approved vendors so learners can eat while they train &mdash; opens no doors.</div>
+        <div class="asset-holder">candidate</div>
+      </div>
+      <div class="ledger-row">
+        <div class="asset-name">Impact Certificates</div>
+        <div><span class="badge tradeable">tradeable</span></div>
+        <div class="asset-desc">Mints when a first credential is followed by a co-signed employment event.</div>
+        <div class="asset-holder">issuer, never the candidate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="loop" id="loop">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">How the loop closes</div>
+      <h2>Funders capitalise the pools. Proof of outcome pays them back.</h2>
+    </div>
+    <div class="loop-wrap">
+      <div class="loop-diagram reveal">
+        <svg viewBox="0 0 100 100" style="position:absolute; inset:0; width:100%; height:100%;">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3" />
+        </svg>
+        <div class="loop-node" style="left:50%; top:8%;">
+          <div class="dot"></div><div class="t">Funder capitalises pool</div><div class="s">Rand, once</div>
+        </div>
+        <div class="loop-node" style="left:86.4%; top:29%;">
+          <div class="dot"></div><div class="t">Reserve pool</div><div class="s">issuer-held</div>
+        </div>
+        <div class="loop-node" style="left:86.4%; top:71%;">
+          <div class="dot"></div><div class="t">Learner earns</div><div class="s">XP + Reward Tokens</div>
+        </div>
+        <div class="loop-node" style="left:50%; top:92%;">
+          <div class="dot"></div><div class="t">Employment event</div><div class="s">co-signed</div>
+        </div>
+        <div class="loop-node" style="left:13.6%; top:71%;">
+          <div class="dot"></div><div class="t">Impact Certificate mints</div><div class="s">issuer-owned</div>
+        </div>
+        <div class="loop-node" style="left:13.6%; top:29%;">
+          <div class="dot"></div><div class="t">Certificate sold</div><div class="s">back to funder</div>
+        </div>
+      </div>
+      <div class="loop-list reveal">
+        <div class="loop-item"><div><b>Funder capitalises a reserve pool</b><span>Converted to Rand once, at funding &mdash; not at every redemption.</span></div></div>
+        <div class="loop-item"><div><b>Candidates learn, and get paid to</b><span>XP Tokens and Reward Tokens accrue through issuer-run courses.</span></div></div>
+        <div class="loop-item"><div><b>A credential leads to a job</b><span>Organisation and candidate co-sign the employment event.</span></div></div>
+        <div class="loop-item"><div><b>An Impact Certificate mints</b><span>Owned by the issuer &mdash; proof the training worked.</span></div></div>
+        <div class="loop-item"><div><b>The funder buys it back</b><span>Capital recycles into skilling that demonstrably ends in employment.</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="preview" id="product">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Product</div>
+      <h2>Postings become predicates. Matching becomes a query.</h2>
+      <p class="section-sub">Organisations stop writing job descriptions and start writing requirements. Candidates see exactly what the market is asking for before they choose what to learn.</p>
+    </div>
+    <div class="preview-grid">
+      <div class="reveal">
+        <div class="app-frame">
+          <div class="app-chrome"><i></i><i></i><i></i><span>new-posting &mdash; junior-backend-engineer</span></div>
+          <div class="app-body">
+            <div class="app-label">Requirements, as predicates</div>
+            <div><span class="predicate-chip"><b>Course Credential</b> &middot; Backend Bootcamp (IssuerX)</span></div>
+            <div class="predicate-and">AND</div>
+            <div><span class="predicate-chip"><b>&ge; 500 XP</b> &middot; IssuerX</span></div>
+            <div class="predicate-and">AND</div>
+            <div><span class="predicate-chip"><b>&ge; 3 attestations</b> &middot; Reputation Credential</span></div>
+          </div>
+        </div>
+        <p class="preview-caption">A job posting, written the way the profile is queried.</p>
+      </div>
+      <div class="reveal">
+        <div class="app-frame">
+          <div class="app-chrome"><i></i><i></i><i></i><span>candidate-profile &mdash; 0x4a...e19f</span></div>
+          <div class="app-body">
+            <div class="app-label">Candidate profile</div>
+            <div class="profile-row"><span class="k">XP (IssuerX)</span><span class="v">612</span></div>
+            <div class="profile-row"><span class="k">Course Credentials</span><span class="v">2 issued</span></div>
+            <div class="profile-row"><span class="k">Reputation attestations</span><span class="v">4</span></div>
+            <div class="profile-row"><span class="k">Reward Token balance</span><span class="v">R 380</span></div>
+            <div class="match-result">&#10003; Qualifies for junior-backend-engineer &mdash; verified against public key, no disclosure needed beyond the boolean.</div>
+          </div>
+        </div>
+        <p class="preview-caption">Qualification returns yes or no. Anything more, the candidate chooses to reveal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stack" id="stack">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Architecture</div>
+      <h2>Built on Hedera. Trust doesn't route through us.</h2>
+      <p class="section-sub">Two services do the work; a registry, not an operator, is what verification actually trusts.</p>
+    </div>
+
+    <div class="layer-grid reveal">
+      <div class="layer-card">
+        <div class="tag">HTS &middot; Hedera Token Service</div>
+        <h3>Issues the tokens</h3>
+        <p>Issuers mint their own XP and Reward Tokens. Freeze-after-mint enforces non-transferability on soulbound assets; wipe keys let issuers reclaim unspent reserves at expiry.</p>
+      </div>
+      <div class="layer-card">
+        <div class="tag">HCS &middot; Hedera Consensus Service</div>
+        <h3>Publishes the credentials</h3>
+        <p>Credentials are published in full &mdash; no links, nothing to break when a certificate moves. Redemption burns tokens and releases reserves atomically, or not at all.</p>
+      </div>
+    </div>
+
+    <div class="principle-box reveal">
+      <div class="tag">The governing stance</div>
+      <h3>Per-issuer sovereignty</h3>
+      <p>No authority spans issuers, and no party holds authority the Operator is explicitly forbidden from holding. XP doesn't aggregate across issuers. Freeze keys stay with the issuer that minted the token. Governance runs one DAO per issuer, weighted by that issuer's own soulbound XP &mdash; so influence can't be bought and can't be borrowed from somewhere else.</p>
+    </div>
+
+    <div class="decisions reveal">
+      <div class="decision-row"><div class="k">onboarding</div><div class="v">Operator creates the candidate's Hedera account at signup and hands the key over non-custodially &mdash; no wallet install required to start.</div></div>
+      <div class="decision-row"><div class="k">signing</div><div class="v">Employment events are propose &rarr; accept: organisation proposes, candidate co-signs within a window, silence lets it lapse.</div></div>
+      <div class="decision-row"><div class="k">reserves</div><div class="v">Pools stay Rand-native. Conversion happens once, when a funder capitalises a pool &mdash; not on every redemption.</div></div>
+      <div class="decision-row"><div class="k">verification</div><div class="v">Issuer keys resolve via a public HCS registry through mirror nodes &mdash; never an Operator-hosted API.</div></div>
+      <div class="decision-row"><div class="k">revocation</div><div class="v">Fraud or issuer error only. Nothing is deleted &mdash; a revocation is a new record, and verification always checks for one.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="audience" id="audience">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Get started</div>
+      <h2>Three sides of one market.</h2>
+    </div>
+    <div class="audience-grid reveal">
+      <div class="audience-card">
+        <div class="tag">Candidates</div>
+        <h3>Learn, get paid, own the proof</h3>
+        <p>Take issuer-run courses, earn Reward Tokens while you train, and walk away with credentials that are yours &mdash; portable to any employer who asks.</p>
+        <a class="btn btn-outline" href="#">Join as a candidate</a>
+      </div>
+      <div class="audience-card">
+        <div class="tag">Organisations</div>
+        <h3>Post requirements, not prose</h3>
+        <p>Issue courses, sign credentials, and hire against verified predicates instead of re-running vetting someone else already did.</p>
+        <a class="btn btn-outline" href="#">Become an issuer</a>
+      </div>
+      <div class="audience-card">
+        <div class="tag">Funders</div>
+        <h3>Buy proof the training worked</h3>
+        <p>Capitalise a reserve pool, and buy back the Impact Certificates that prove your capital turned into employment &mdash; then recycle it.</p>
+        <a class="btn btn-outline" href="#">Fund a pool</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="wordmark"><b>ATT</b>ESTANT</div>
+    <div class="foot-note">Learn2Earn &middot; built on Hedera HTS + HCS</div>
+  </div>
+</footer>
+
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var els = document.querySelectorAll('.reveal');
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(function(el) { io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('in'); });
+  }
+</script>
